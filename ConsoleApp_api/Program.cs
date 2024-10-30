@@ -36,6 +36,7 @@ using System.Xml.Linq;
 using System.Net.Http.Headers;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
+using Npgsql;
 //using Newtonsoft.Json;
 
 namespace ConsoleApp_api
@@ -113,9 +114,10 @@ namespace ConsoleApp_api
             string rsp_operator = string.Empty;
             string outdata_masking = string.Empty;
 
-            OleDbConnection connectObj1 = new OleDbConnection("Provider=SQLOLEDB;Data Source=WINTEL-ECS;uid=sa;pwd=K1B2A3#;" + "Initial Catalog=my_db");
+            //OleDbConnection connectObj1 = new OleDbConnection("Provider=SQLOLEDB;Data Source=WINTEL-ECS;uid=sa;pwd=K1B2A3#;" + "Initial Catalog=my_db");
+            string connString = "Host=localhost;Port=5432;Username=postgres;Password=@Online5@;Database=WAHED_DB;";
 
-            OleDbCommand sampleCMD1 = new OleDbCommand("a2p_data_from_client_receive", connectObj1);
+            /*OleDbCommand sampleCMD1 = new OleDbCommand("a2p_data_from_client_receive", connectObj1);
             sampleCMD1.CommandType = CommandType.StoredProcedure;
 
             OleDbParameter sampParm1 = new OleDbParameter();
@@ -167,63 +169,167 @@ namespace ConsoleApp_api
 
 
             sampParm1 = sampleCMD1.Parameters.Add("@outdata", OleDbType.VarChar, 160);
-            sampParm1.Direction = ParameterDirection.Output;
-
-            try
+            sampParm1.Direction = ParameterDirection.Output;*/
+            using (var conn = new NpgsqlConnection(connString))
             {
-                connectObj1.Open();
-                sampleCMD1.ExecuteNonQuery();
-                connectObj1.Close();
+                using (var cmd = new NpgsqlCommand("a2p_data_from_client_receive", conn))
+                {
+                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                    // Output parameters
+                    var idd = new NpgsqlParameter("idd", NpgsqlTypes.NpgsqlDbType.Integer)
+                    {
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(idd);
 
-                if (int.TryParse(sampleCMD1.Parameters["@id"].Value.ToString().Trim(), out id) == false)
-                {
-                    id = 0;
-                }
-                else
-                {
-                    id = Convert.ToInt32(sampleCMD1.Parameters["@id"].Value.ToString());
-                }
+                    var client_idd = new NpgsqlParameter("client_idd", NpgsqlTypes.NpgsqlDbType.Varchar,50)
+                    {
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(client_idd);
 
+                    var client_request_idd = new NpgsqlParameter("client_request_idd", NpgsqlTypes.NpgsqlDbType.Varchar,50)
+                    {
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(client_request_idd);
 
-                client_id = sampleCMD1.Parameters["@client_id"].Value.ToString().Trim();
-                client_request_id = sampleCMD1.Parameters["@client_request_id"].Value.ToString().Trim();
-                if (int.TryParse(sampleCMD1.Parameters["@unique_request_id"].Value.ToString().Trim(), out unique_request_id) == false)
-                {
-                    unique_request_id = 0;
+                    var unique_request_idd = new NpgsqlParameter("unique_request_idd", NpgsqlTypes.NpgsqlDbType.Integer)
+                    {
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(unique_request_idd);
+
+                    var operatorr = new NpgsqlParameter("operatorr", NpgsqlTypes.NpgsqlDbType.Varchar, 50)
+                    {
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(operatorr);
+
+                    var msisdnn = new NpgsqlParameter("msisdnn", NpgsqlTypes.NpgsqlDbType.Varchar, 50)
+                    {
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(msisdnn);
+
+                    var extrefnumm = new NpgsqlParameter("extrefnumm", NpgsqlTypes.NpgsqlDbType.Varchar, 50)
+                    {
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(extrefnumm);
+
+                    var msisdn22 = new NpgsqlParameter("msisdn22", NpgsqlTypes.NpgsqlDbType.Varchar, 50)
+                    {
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(msisdn22);
+
+                    var clii = new NpgsqlParameter("clii", NpgsqlTypes.NpgsqlDbType.Varchar, 50)
+                    {
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(clii);
+
+                    var messagee = new NpgsqlParameter("messagee", NpgsqlTypes.NpgsqlDbType.Text)
+                    {
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(messagee);
+
+                    var messagetypee = new NpgsqlParameter("messagetypee", NpgsqlTypes.NpgsqlDbType.Varchar,10)
+                    {
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(messagetypee);
+
+                    var ismaskingg = new NpgsqlParameter("ismaskingg", NpgsqlTypes.NpgsqlDbType.Varchar, 10)
+                    {
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(ismaskingg);
+
+                    var maskingg = new NpgsqlParameter("maskingg", NpgsqlTypes.NpgsqlDbType.Varchar, 11)
+                    {
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(maskingg);
+
+                    var no_of_msgg = new NpgsqlParameter("no_of_msgg", NpgsqlTypes.NpgsqlDbType.Integer)
+                    {
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(no_of_msgg);
+
+                    var unicodee = new NpgsqlParameter("unicode", NpgsqlTypes.NpgsqlDbType.Varchar,20)
+                    {
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(unicodee);
+
+                    var outdataa = new NpgsqlParameter("outdata", NpgsqlTypes.NpgsqlDbType.Varchar, 20)
+                    {
+                        Direction = System.Data.ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(outdataa);
+
+                    try
+                    {
+                        conn.Open();
+                        cmd.ExecuteNonQuery();
+                        conn.Close();
+
+                        //output.Value.ToString();
+                        if (int.TryParse(idd.Value.ToString().Trim(), out id) == false)
+                        {
+                            id = 0;
+                        }
+                        else
+                        {
+                            id = Convert.ToInt32(idd.Value.ToString());
+                        }
+                        //id = Convert.ToInt32(idd.Value.ToString());
+                        client_id = client_idd.Value.ToString().Trim();
+                        client_request_id = client_request_idd.Value.ToString().Trim();
+                        if (int.TryParse(unique_request_idd.Value.ToString().Trim(), out unique_request_id) == false)
+                        {
+                            unique_request_id = 0;
+                        }
+                        else
+                        {
+                            unique_request_id = Convert.ToInt32(unique_request_idd.Value.ToString());
+                        }
+                        opt = operatorr.Value.ToString().Trim();
+                        msisdn = msisdnn.Value.ToString().Trim();
+                        extrefnum = extrefnumm.Value.ToString().Trim();
+                        msisdn2 = msisdn22.Value.ToString().Trim();
+                        cli = clii.Value.ToString().Trim();
+                        message = messagee.Value.ToString().Trim();
+                        messagetype = messagetypee.Value.ToString().Trim();
+                        ismasking = ismaskingg.Value.ToString().Trim();
+                        masking = maskingg.Value.ToString().Trim();
+                        if (int.TryParse(no_of_msgg.Value.ToString().Trim(), out amount) == false)
+                        {
+                            no_of_msg = 0;
+                        }
+                        else
+                        {
+                            no_of_msg = Convert.ToInt32(no_of_msgg.Value.ToString());
+                        }
+                        unicode = unicodee.Value.ToString().Trim();
+                        string outdata = outdataa.Value.ToString().Trim();
+
+                        Console.WriteLine("opt: " + opt);
+                        Console.WriteLine("no_of_msg: " + no_of_msg);
+                        Console.WriteLine("outdata : " + outdata);
+                        message = message.Replace("\r", String.Empty);
+                        message = message.Replace("\t", String.Empty);
+                    }
+                    catch (Exception ep)
+                    {
+                        Console.WriteLine(ep.ToString());
+                        conn.Close();
+                    }
                 }
-                else
-                {
-                    unique_request_id = Convert.ToInt32(sampleCMD1.Parameters["@unique_request_id"].Value.ToString());
-                }
-                opt = sampleCMD1.Parameters["@operator"].Value.ToString().Trim();
-                msisdn = sampleCMD1.Parameters["@msisdn"].Value.ToString().Trim();
-                extrefnum = sampleCMD1.Parameters["@extrefnum"].Value.ToString().Trim();
-                msisdn2 = sampleCMD1.Parameters["@msisdn2"].Value.ToString().Trim();
-                cli = sampleCMD1.Parameters["@cli"].Value.ToString().Trim();
-                message = sampleCMD1.Parameters["@message"].Value.ToString().Trim();
-                messagetype = sampleCMD1.Parameters["@messagetype"].Value.ToString().Trim();
-                ismasking = sampleCMD1.Parameters["@ismasking"].Value.ToString().Trim();
-                masking = sampleCMD1.Parameters["@masking"].Value.ToString().Trim();
-                if (int.TryParse(sampleCMD1.Parameters["@no_of_msg"].Value.ToString().Trim(), out amount) == false)
-                {
-                    no_of_msg = 0;
-                }
-                else
-                {
-                    no_of_msg = Convert.ToInt32(sampleCMD1.Parameters["@no_of_msg"].Value.ToString());
-                }
-                unicode = sampleCMD1.Parameters["@unicode"].Value.ToString().Trim();
-                string outdata = sampleCMD1.Parameters["@outdata"].Value.ToString().Trim();
-                Console.WriteLine("opt: " + opt);
-                Console.WriteLine("no_of_msg: " + no_of_msg);
-                Console.WriteLine("outdata : " + outdata);
-                message = message.Replace("\r", String.Empty);
-                message = message.Replace("\t", String.Empty);
-            }
-            catch (Exception ep)
-            {
-                Console.WriteLine(ep.ToString());
-                connectObj1.Close();
             }
 
             if (unicode == "true")
@@ -247,7 +353,7 @@ namespace ConsoleApp_api
                 if (opt.ToLower() == "gp")
                 {
                     //create proc masking_verification_proc @client_id varchar(50),@masking varchar(11),@opt varchar(50),@outdata varchar(160) output
-                    sampleCMD1 = new OleDbCommand("masking_verification_proc", connectObj1);
+                    /*sampleCMD1 = new OleDbCommand("masking_verification_proc", connectObj1);
                     sampleCMD1.CommandType = CommandType.StoredProcedure;
 
                     sampParm1 = new OleDbParameter();
@@ -263,6 +369,8 @@ namespace ConsoleApp_api
 
                     sampParm1 = sampleCMD1.Parameters.Add("@outdata", OleDbType.VarChar, 160);
                     sampParm1.Direction = ParameterDirection.Output;
+
+
                     try
                     {
 
@@ -280,6 +388,49 @@ namespace ConsoleApp_api
                     {
                         connectObj1.Close();
                         //response = ext.ToString();
+                    }*/
+                    using (var conn = new NpgsqlConnection(connString))
+                    {
+                        //conn.Open();
+
+                        using (var cmd = new NpgsqlCommand("masking_verification_proc", conn))
+                        {
+                            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                            // Input parameter
+                            cmd.Parameters.AddWithValue("client_idd", client_id);
+                            cmd.Parameters.AddWithValue("maskingg", masking.ToString());
+                            cmd.Parameters.AddWithValue("optt", opt.ToString());
+
+                            // Output parameters
+                            var output = new NpgsqlParameter("outdata", NpgsqlTypes.NpgsqlDbType.Varchar,160)
+                            {
+                                Direction = System.Data.ParameterDirection.Output
+                            };
+                            cmd.Parameters.Add(output);
+
+                            // Execute the command
+
+
+
+                            // Retrieve output values
+                            try
+                            {
+                                conn.Open();
+                                cmd.ExecuteNonQuery();
+                                conn.Close();
+
+
+                                outdata_masking = output.Value.ToString();
+                            }
+                            catch (Exception ext)
+                            {
+                                conn.Close();
+                            }
+
+                            // Example: Display the results
+                            //Response.Write($"Name: {empName}<br/>Department: {empDepartment}");
+                        }
                     }
 
 
@@ -292,194 +443,10 @@ namespace ConsoleApp_api
                         else if (masking == "DR.NADIA")
                         {
                             masking = "DR. NADIA";
-                        }
-
-                        /*try
-                        {
-
-
-
-                            System.Net.ServicePointManager.Expect100Continue = true;
-                            ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; // SecurityProtocolType.Tls12
-
-                            HttpWebRequest httpPost = (HttpWebRequest)WebRequest.Create("https://gpcmp.grameenphone.com/ecmapigw/webresources/ecmapigw.v2");
-
-
-
-                            //httpPost.Headers.Add("ContentType", "application/json");
-                            //httpPost.Method = "POST";
-
-                            httpPost.ContentType = "application/json";
-                            httpPost.Method = "POST";
-
-                            using (var streamWriter = new StreamWriter(httpPost.GetRequestStream()))
-                            {
-
-                                string json = new JavaScriptSerializer().Serialize(new
-                                {
-                                    username = "RAPIDAdmin",
-                                    password = "$Winapiwin9%$",
-                                    apicode = "1",
-                                    msisdn = msisdn2,
-                                    countrycode = "880",
-                                    cli = masking,
-                                    messagetype = messagetype1,
-                                    message = message,
-                                    messageid = "0"
-                                });
-
-
-                                streamWriter.Write(json);
-                            }
-
-
-
-
-
-                            HttpWebResponse res = (HttpWebResponse)httpPost.GetResponse();
-
-                            using (StreamReader sr = new StreamReader(res.GetResponseStream(), System.Text.Encoding.Default))
-                            {
-                                backstr = sr.ReadToEnd();
-                                res.Close();
-                            }
-                            try
-                            {
-                                Console.WriteLine("backstr :" + backstr);
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine(ex.ToString());
-
-                            }
-
-
-                        }
-                        catch (System.Exception etext)
-                        {
-
-                            Console.WriteLine(etext.ToString());
-
-                        }
-
-                        JavaScriptSerializer oJS2 = new JavaScriptSerializer();
-                        gpRoot oRootObject2 = oJS2.Deserialize<gpRoot>(backstr);
-
-
-                        string gpstatus = oRootObject2.statusCode.ToString();
-                        string gpmessage = oRootObject2.message.ToString();
-
-                        //OleDbConnection connectObj1 = new OleDbConnection("Provider=SQLOLEDB;Data Source=192.168.3.125;uid=sa;pwd=k7b8a9;" + "Initial Catalog=smscontentnew");
-                        //                          OleDbConnection connectObj1 = new OleDbConnection("Provider=SQLOLEDB;Data Source=192.168.3.9;uid=sa;pwd=k7b8a9;" + "Initial Catalog=smscontentnew");
-
-
-                        sampleCMD1 = new OleDbCommand("a2p_insert_server_receive", connectObj1);
-                        sampleCMD1.CommandType = CommandType.StoredProcedure;
-
-                        sampParm1 = new OleDbParameter();
-                        sampParm1 = sampleCMD1.Parameters.Add("@client_id", OleDbType.VarChar, 50);
-                        sampParm1.Value = client_id;
-                        sampParm1 = sampleCMD1.Parameters.Add("@client_request_id", OleDbType.VarChar, 50);
-                        sampParm1.Value = client_request_id;
-                        sampParm1 = sampleCMD1.Parameters.Add("@unique_request_id", OleDbType.Integer);
-                        sampParm1.Value = unique_request_id;
-                        sampParm1 = sampleCMD1.Parameters.Add("@operator", OleDbType.VarChar, 50);
-                        sampParm1.Value = opt;
-                        sampParm1 = sampleCMD1.Parameters.Add("@msisdn", OleDbType.VarChar, 50);
-                        sampParm1.Value = msisdn;
-                        //     sampParm1 = sampleCMD1.Parameters.Add("@type", OleDbType.VarChar, 50);
-                        //     sampParm1.Value = type;
-                        sampParm1 = sampleCMD1.Parameters.Add("@msisdn2", OleDbType.VarChar, 50);
-                        sampParm1.Value = msisdn2;
-                        //             sampParm1 = sampleCMD1.Parameters.Add("@amount", OleDbType.Integer);
-                        //          sampParm1.Value = amount;
-                        //            sampParm1 = sampleCMD1.Parameters.Add("@txnstatus", OleDbType.VarChar, 50);
-                        //            sampParm1.Value = rsp_txnstatus;
-                        sampParm1 = sampleCMD1.Parameters.Add("@extrefnum", OleDbType.VarChar, 50);
-                        sampParm1.Value = extrefnum;
-
-                        sampParm1 = sampleCMD1.Parameters.Add("@cli", OleDbType.VarChar, 50);
-                        sampParm1.Value = cli;
-                        sampParm1 = sampleCMD1.Parameters.Add("@message", OleDbType.WChar, 1000);
-                        sampParm1.Value = message;
-                        sampParm1 = sampleCMD1.Parameters.Add("@messagetype", OleDbType.VarChar, 10);
-                        sampParm1.Value = messagetype;
-                        sampParm1 = sampleCMD1.Parameters.Add("@masking", OleDbType.VarChar, 11);
-                        sampParm1.Value = masking;
-
-                        sampParm1 = sampleCMD1.Parameters.Add("@no_of_msg", OleDbType.Integer);
-                        sampParm1.Value = no_of_msg;
-                        sampParm1 = sampleCMD1.Parameters.Add("@error_code", OleDbType.VarChar, 10);
-                        // sampParm1.Value = rsp_message;
-                        sampParm1.Value = "";
-                        sampParm1 = sampleCMD1.Parameters.Add("@contact", OleDbType.VarChar, 10);
-                        //  sampParm1.Value = req_type;
-                        sampParm1.Value = "";
-                        sampParm1 = sampleCMD1.Parameters.Add("@creditDeducted", OleDbType.Integer);
-                        //  sampParm1.Value = rsp_date;
-                        sampParm1.Value = 0;
-
-                        sampParm1 = sampleCMD1.Parameters.Add("@currentBalance", OleDbType.Integer);
-                        //sampParm1.Value = rsp_txnid;
-                        sampParm1.Value = 0;
-                        sampParm1 = sampleCMD1.Parameters.Add("@description", OleDbType.VarWChar, 400);
-                        //sampParm1.Value = str;
-                        if (gpstatus == "200")
-                        {
-                            sampParm1.Value = "success";
-                        }
-                        else
-                        {
-                            sampParm1.Value = "fail";
-                        }
-                        sampParm1 = sampleCMD1.Parameters.Add("@smsID", OleDbType.VarChar, 50);
-                        //sampParm1.Value = req_type;
-                        sampParm1.Value = gpmessage;
-                        sampParm1 = sampleCMD1.Parameters.Add("@server_process_date", OleDbType.VarChar, 100);
-                        //sampParm1.Value = rsp_date;
-                        sampParm1.Value = DateTime.Now;
-
-                        sampParm1 = sampleCMD1.Parameters.Add("@ismasking", OleDbType.VarChar, 10);
-                        sampParm1.Value = ismasking;
-
-                        sampParm1 = sampleCMD1.Parameters.Add("@unicode", OleDbType.VarChar, 20);
-                        sampParm1.Value = unicode;
-
-                        sampParm1 = sampleCMD1.Parameters.Add("@outdata", OleDbType.VarChar, 160);
-                        sampParm1.Direction = ParameterDirection.Output;
-
+                        }                        
 
                         try
                         {
-                            Console.WriteLine("execute1");
-                            connectObj1.Open();
-                            sampleCMD1.ExecuteNonQuery();
-                            connectObj1.Close();
-                            Console.WriteLine("execute2");
-                        }
-                        catch (Exception ep)
-                        {
-
-                            Console.WriteLine(ep.ToString());
-
-                        }*/
-
-                        try
-                        {
-
-                            /*  if (messagetype == "text")
-                              {
-                                  messagetype1 = "1";
-                              }
-                              else if (messagetype == "unicode")
-                              {
-                                  messagetype1 = "3";
-                              }
-                              else if (messagetype == "flash")
-                              {
-                                  messagetype1 = "2";
-                              }*/
-
                             System.Net.ServicePointManager.Expect100Continue = true;
                             ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; // SecurityProtocolType.Tls12
 
@@ -569,14 +536,7 @@ namespace ConsoleApp_api
                             mnoResponseCode = "";
                         }
 
-
-                        //string mnoResponseMessage = oRootObject2.mnoResponseMessage.ToString();
-
-                        //OleDbConnection connectObj1 = new OleDbConnection("Provider=SQLOLEDB;Data Source=192.168.3.125;uid=sa;pwd=k7b8a9;" + "Initial Catalog=smscontentnew");
-                        //                          OleDbConnection connectObj1 = new OleDbConnection("Provider=SQLOLEDB;Data Source=192.168.3.9;uid=sa;pwd=k7b8a9;" + "Initial Catalog=smscontentnew");
-
-
-                        sampleCMD1 = new OleDbCommand("a2p_insert_server_receive", connectObj1);
+                        /*sampleCMD1 = new OleDbCommand("a2p_insert_server_receive", connectObj1);
                         sampleCMD1.CommandType = CommandType.StoredProcedure;
 
                         sampParm1 = new OleDbParameter();
@@ -665,6 +625,76 @@ namespace ConsoleApp_api
 
                             Console.WriteLine(ep.ToString());
 
+                        }*/
+
+                        using (var conn = new NpgsqlConnection(connString))
+                        {
+                            //conn.Open();
+
+                            using (var cmd = new NpgsqlCommand("a2p_insert_server_receive", conn))
+                            {
+                                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                                // Input parameter
+                                cmd.Parameters.AddWithValue("client_idd", client_id);
+                                cmd.Parameters.AddWithValue("client_request_idd", client_request_id);
+                                cmd.Parameters.AddWithValue("unique_request_idd", unique_request_id);
+                                cmd.Parameters.AddWithValue("operatorr", opt);
+                                cmd.Parameters.AddWithValue("msisdnn", msisdn);
+                                cmd.Parameters.AddWithValue("msisdn22", msisdn2);
+                                cmd.Parameters.AddWithValue("extrefnumm", extrefnum);
+                                cmd.Parameters.AddWithValue("clii", cli);
+                                cmd.Parameters.AddWithValue("messagee", message);
+                                cmd.Parameters.AddWithValue("messagetypee", messagetype);
+                                cmd.Parameters.AddWithValue("maskingg", masking);
+                                cmd.Parameters.AddWithValue("no_of_msgg", no_of_msg);
+                                cmd.Parameters.AddWithValue("error_codee", serverResponseCode);
+                                cmd.Parameters.AddWithValue("contactt", "");
+                                cmd.Parameters.AddWithValue("creditDeductedd", 0);
+                                cmd.Parameters.AddWithValue("currentBalancee", 0);
+                                if (mnoResponseCode == "1000")
+                                {
+                                    cmd.Parameters.AddWithValue("descriptionn", "success");
+                                }
+                                else
+                                {
+                                    cmd.Parameters.AddWithValue("descriptionn", "fail : mnoResponseCode : " + mnoResponseCode);
+                                }
+
+                                cmd.Parameters.AddWithValue("smsIDD", "serverTxnId : " + serverTxnId + " mnoTxnId : " + mnoTxnId);
+                                cmd.Parameters.AddWithValue("server_process_datee", DateTime.Now);
+                                cmd.Parameters.AddWithValue("ismaskingg", ismasking);
+                                cmd.Parameters.AddWithValue("unicodee", unicode);
+
+                                // Output parameters
+                                var output = new NpgsqlParameter("outdata", NpgsqlTypes.NpgsqlDbType.Varchar,160)
+                                {
+                                    Direction = System.Data.ParameterDirection.Output
+                                };
+                                cmd.Parameters.Add(output);
+
+                                // Execute the command
+
+
+
+                                // Retrieve output values
+                                try
+                                {
+                                    conn.Open();
+                                    cmd.ExecuteNonQuery();
+                                    conn.Close();
+                                    Console.WriteLine("execute1");
+                                    Console.WriteLine("execute2");
+                                }
+                                catch (Exception ext)
+                                {
+                                    conn.Close();
+                                    Console.WriteLine(ext.ToString());
+                                }
+
+                                // Example: Display the results
+                                //Response.Write($"Name: {empName}<br/>Department: {empDepartment}");
+                            }
                         }
                     }
 
@@ -674,7 +704,7 @@ namespace ConsoleApp_api
                 else if (opt.ToLower() == "teletalk")
                 {
                     //create proc masking_verification_proc @client_id varchar(50),@masking varchar(11),@opt varchar(50),@outdata varchar(160) output
-                    sampleCMD1 = new OleDbCommand("masking_verification_proc", connectObj1);
+                    /*sampleCMD1 = new OleDbCommand("masking_verification_proc", connectObj1);
                     sampleCMD1.CommandType = CommandType.StoredProcedure;
 
                     sampParm1 = new OleDbParameter();
@@ -707,278 +737,56 @@ namespace ConsoleApp_api
                     {
                         connectObj1.Close();
                         //response = ext.ToString();
+                    }*/
+                    using (var conn = new NpgsqlConnection(connString))
+                    {
+                        //conn.Open();
+
+                        using (var cmd = new NpgsqlCommand("masking_verification_proc", conn))
+                        {
+                            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                            // Input parameter
+                            cmd.Parameters.AddWithValue("client_idd", client_id);
+                            cmd.Parameters.AddWithValue("maskingg", masking.ToString());
+                            cmd.Parameters.AddWithValue("optt", opt.ToString());
+
+                            // Output parameters
+                            var output = new NpgsqlParameter("outdata", NpgsqlTypes.NpgsqlDbType.Varchar, 160)
+                            {
+                                Direction = System.Data.ParameterDirection.Output
+                            };
+                            cmd.Parameters.Add(output);
+
+                            // Execute the command
+
+
+
+                            // Retrieve output values
+                            try
+                            {
+                                conn.Open();
+                                cmd.ExecuteNonQuery();
+                                conn.Close();
+
+
+                                outdata_masking = output.Value.ToString();
+                            }
+                            catch (Exception ext)
+                            {
+                                conn.Close();
+                            }
+
+                            // Example: Display the results
+                            //Response.Write($"Name: {empName}<br/>Department: {empDepartment}");
+                        }
                     }
 
 
                     if (outdata_masking == "masking matched")
                     {
-                        /*try
-                        {
-
-                            System.Net.ServicePointManager.Expect100Continue = true;
-                            ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; // SecurityProtocolType.Tls12
-
-
-                            //HttpWebRequest httpPost = (HttpWebRequest)WebRequest.Create("https://agentapi.paywellonline.com/Recharge/mobileRecharge/singleTopup");
-                            //HttpWebRequest httpPost = (HttpWebRequest)WebRequest.Create("https://agentapi.paywellonline.com/Recharge/mobileRecharge/mobileRechargeEnquiry");
-                            HttpWebRequest httpPost = (HttpWebRequest)WebRequest.Create("http://bulkmsg.teletalk.com.bd/api/sendSMS");
-
-
-
-                            httpPost.Headers.Add("ContentType", "application/json");
-                            httpPost.Method = "POST";
-
-
-
-
-
-                            using (var streamWriter = new StreamWriter(httpPost.GetRequestStream()))
-                            {
-
-                                string json = new JavaScriptSerializer().Serialize(new
-                                {
-                                    auth = new
-                                    {
-                                      
-                                        username = "wintel2nd",
-                                        password = "WinTtmgsP#45R5z",
-                                        acode = "1005210"
-
-                                    },
-
-                                    smsInfo = new
-                                    {
-                                        message = message,
-                                        //masking = "8801552146270",
-                                        is_unicode = unicode_value,
-                                        masking = masking,
-                                        msisdn = new[] { msisdn2 },
-                                        //01534983669
-                                    }
-
-                                });
-
-
-                                streamWriter.Write(json);
-                            }
-
-
-
-                            //string backstr = string.Empty;
-
-                            HttpWebResponse res = (HttpWebResponse)httpPost.GetResponse();
-
-                            using (StreamReader sr = new StreamReader(res.GetResponseStream(), System.Text.Encoding.Default))
-                            {
-                                backstr = sr.ReadToEnd();
-                                res.Close();
-                            }
-                            //sr.Close();
-                            //res.Close();
-
-                            try
-                            {
-
-                                // {"error_code":0,"contact":1,"creditDeducted":2,"currentBalance":"3","description":"Success",
-                                //"smsInfo":[{"smsID":"202010051243335f7ac0957a440","msisdn":"8801550156198"}]}
-
-
-                                Console.WriteLine("backstr :" + backstr);
-                                JavaScriptSerializer oJS2 = new JavaScriptSerializer();
-                                rspdata oRootObject2 = oJS2.Deserialize<rspdata>(backstr);
-
-                                // int status = oRootObject2.data.status;
-                                rsp_error_code = oRootObject2.error_code.ToString();
-                                // if (oRootObject2.contact != null)
-                                // {
-                                rsp_contact = oRootObject2.contact.ToString();
-                                //  }
-                                if (oRootObject2.creditDeducted.ToString() != null)
-                                {
-                                    rsp_creditDeducted = oRootObject2.creditDeducted.ToString();
-                                }
-
-                                if (oRootObject2.currentBalance.ToString() != null)
-                                {
-
-                                    rsp_currentBalance = oRootObject2.currentBalance.ToString();
-                                }
-                                if (oRootObject2.description.ToString() != null)
-                                {
-                                    rsp_description = oRootObject2.description.ToString();
-                                }
-                                foreach (smsInfo cad in oRootObject2.smsInfo)
-                                {
-                                    rsp_smsID = cad.smsID.ToString();
-                                    rsp_msisdn = cad.msisdn.ToString();
-                                }
-                                //status,message,trans_id,msisdn,amount,con_type,operator,clientTrxId
-
-                                Console.WriteLine("rsp_error_code : " + rsp_error_code.ToString());
-                                //  Console.WriteLine("<br>");
-                                Console.WriteLine("rsp_contact :" + rsp_contact.ToString());
-                                //  Console.WriteLine("<br>");
-                                Console.WriteLine("rsp_creditDeducted :" + rsp_creditDeducted.ToString());
-                                //  Console.WriteLine("<br>");
-                                Console.WriteLine("rsp_currentBalance :" + rsp_currentBalance.ToString());
-                                Console.WriteLine("rsp_description :" + rsp_description.ToString());
-                                Console.WriteLine("rsp_smsID :" + rsp_smsID.ToString());
-                                Console.WriteLine("rsp_msisdn :" + rsp_msisdn.ToString());
-                                //   Console.WriteLine("clientTrxId :" + clientTrxId.ToString());
-                            }
-                            catch (Exception ex)
-                            {
-                                Console.WriteLine(ex.ToString());
-
-                            }
-
-
-
-
-                        }
-                        catch (System.Exception etext)
-                        {
-
-                            Console.WriteLine(etext.ToString());
-
-                        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                        //OleDbConnection connectObj1 = new OleDbConnection("Provider=SQLOLEDB;Data Source=192.168.3.125;uid=sa;pwd=k7b8a9;" + "Initial Catalog=smscontentnew");
-                        //                          OleDbConnection connectObj1 = new OleDbConnection("Provider=SQLOLEDB;Data Source=192.168.3.9;uid=sa;pwd=k7b8a9;" + "Initial Catalog=smscontentnew");
-
-                        //create proc a2p_insert_server_receive @client_id varchar(50),@client_request_id varchar(50),@unique_request_id int, @operator varchar(50),@msisdn varchar(50),@msisdn2 varchar(50),
-                        //@extrefnum varchar(50),@cli varchar(50),@message nvarchar(760),@messagetype varchar(10),@masking varchar(11),
-                        //@no_of_msg int, @error_code varchar(10),@contact varchar(10),@creditDeducted int, @currentBalance int, @description varchar(400),
-                        //@smsID varchar(50),@server_process_date varchar(100),@ismasking varchar(10),@outdata varchar(160) output
-
-                        sampleCMD1 = new OleDbCommand("a2p_insert_server_receive", connectObj1);
-                        sampleCMD1.CommandType = CommandType.StoredProcedure;
-
-                        sampParm1 = new OleDbParameter();
-                        sampParm1 = sampleCMD1.Parameters.Add("@client_id", OleDbType.VarChar, 50);
-                        sampParm1.Value = client_id;
-                        sampParm1 = sampleCMD1.Parameters.Add("@client_request_id", OleDbType.VarChar, 50);
-                        sampParm1.Value = client_request_id;
-                        sampParm1 = sampleCMD1.Parameters.Add("@unique_request_id", OleDbType.Integer);
-                        sampParm1.Value = unique_request_id;
-                        sampParm1 = sampleCMD1.Parameters.Add("@operator", OleDbType.VarChar, 50);
-                        sampParm1.Value = opt;
-                        sampParm1 = sampleCMD1.Parameters.Add("@msisdn", OleDbType.VarChar, 50);
-                        sampParm1.Value = msisdn;
-                        //     sampParm1 = sampleCMD1.Parameters.Add("@type", OleDbType.VarChar, 50);
-                        //     sampParm1.Value = type;
-                        sampParm1 = sampleCMD1.Parameters.Add("@msisdn2", OleDbType.VarChar, 50);
-                        //      sampParm1.Value = msisdn2;
-                        sampParm1.Value = rsp_msisdn;
-
-                        //             sampParm1 = sampleCMD1.Parameters.Add("@amount", OleDbType.Integer);
-                        //          sampParm1.Value = amount;
-                        //            sampParm1 = sampleCMD1.Parameters.Add("@txnstatus", OleDbType.VarChar, 50);
-                        //            sampParm1.Value = rsp_txnstatus;
-                        sampParm1 = sampleCMD1.Parameters.Add("@extrefnum", OleDbType.VarChar, 50);
-                        sampParm1.Value = extrefnum;
-
-                        sampParm1 = sampleCMD1.Parameters.Add("@cli", OleDbType.VarChar, 50);
-                        sampParm1.Value = cli;
-                        sampParm1 = sampleCMD1.Parameters.Add("@message", OleDbType.WChar, 1000);
-                        sampParm1.Value = message;
-                        sampParm1 = sampleCMD1.Parameters.Add("@messagetype", OleDbType.VarChar, 10);
-                        sampParm1.Value = messagetype;
-                        sampParm1 = sampleCMD1.Parameters.Add("@masking", OleDbType.VarChar, 11);
-                        sampParm1.Value = masking;
-
-                        sampParm1 = sampleCMD1.Parameters.Add("@no_of_msg", OleDbType.Integer);
-                        sampParm1.Value = no_of_msg;
-                        sampParm1 = sampleCMD1.Parameters.Add("@error_code", OleDbType.VarChar, 10);
-                        // sampParm1.Value = rsp_message;
-                        sampParm1.Value = rsp_error_code;
-                        sampParm1 = sampleCMD1.Parameters.Add("@contact", OleDbType.VarChar, 10);
-                        //  sampParm1.Value = req_type;
-                        sampParm1.Value = rsp_contact;
-                        sampParm1 = sampleCMD1.Parameters.Add("@creditDeducted", OleDbType.Integer);
-                        //sampParm1.Value = no_of_msg;
-                        sampParm1.Value = rsp_creditDeducted;
-
-                        sampParm1 = sampleCMD1.Parameters.Add("@currentBalance", OleDbType.Integer);
-                        //sampParm1.Value = 1;
-                        sampParm1.Value = rsp_currentBalance;
-                        sampParm1 = sampleCMD1.Parameters.Add("@description", OleDbType.VarChar, 400);
-                        if (rsp_error_code == "0")
-                        {
-                            sampParm1.Value = "success";
-                        }
-                        else
-                        {
-                            sampParm1.Value = "fail";
-                        }
-                        sampParm1 = sampleCMD1.Parameters.Add("@smsID", OleDbType.VarChar, 50);
-                        //sampParm1.Value = req_type;
-                        sampParm1.Value = rsp_smsID;
-                        sampParm1 = sampleCMD1.Parameters.Add("@server_process_date", OleDbType.VarChar, 100);
-                        //sampParm1.Value = rsp_date;
-                        sampParm1.Value = DateTime.Now;
-
-                        sampParm1 = sampleCMD1.Parameters.Add("@ismasking", OleDbType.VarChar, 10);
-                        sampParm1.Value = ismasking;
-
-                        sampParm1 = sampleCMD1.Parameters.Add("@unicode", OleDbType.VarChar, 20);
-                        sampParm1.Value = unicode;
-
-                        sampParm1 = sampleCMD1.Parameters.Add("@outdata", OleDbType.VarChar, 160);
-                        sampParm1.Direction = ParameterDirection.Output;
-
-
                         try
                         {
-                            Console.WriteLine("execute1");
-                            connectObj1.Open();
-                            sampleCMD1.ExecuteNonQuery();
-                            connectObj1.Close();
-                            Console.WriteLine("execute2");
-                        }
-                        catch (Exception ep)
-                        {
-
-                            Console.WriteLine(ep.ToString());
-
-                        }*/
-
-                        try
-                        {
-
-                            /*  if (messagetype == "text")
-                              {
-                                  messagetype1 = "1";
-                              }
-                              else if (messagetype == "unicode")
-                              {
-                                  messagetype1 = "3";
-                              }
-                              else if (messagetype == "flash")
-                              {
-                                  messagetype1 = "2";
-                              }*/
-
-
                             if (masking == "DR.NADIA")
                             {
                                 masking = "DR. NADIA";
@@ -1097,7 +905,7 @@ namespace ConsoleApp_api
                         //                          OleDbConnection connectObj1 = new OleDbConnection("Provider=SQLOLEDB;Data Source=192.168.3.9;uid=sa;pwd=k7b8a9;" + "Initial Catalog=smscontentnew");
 
 
-                        sampleCMD1 = new OleDbCommand("a2p_insert_server_receive", connectObj1);
+                        /*sampleCMD1 = new OleDbCommand("a2p_insert_server_receive", connectObj1);
                         sampleCMD1.CommandType = CommandType.StoredProcedure;
 
                         sampParm1 = new OleDbParameter();
@@ -1186,13 +994,82 @@ namespace ConsoleApp_api
 
                             Console.WriteLine(ep.ToString());
 
+                        }*/
+                        using (var conn = new NpgsqlConnection(connString))
+                        {
+                            //conn.Open();
+
+                            using (var cmd = new NpgsqlCommand("a2p_insert_server_receive", conn))
+                            {
+                                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                                // Input parameter
+                                cmd.Parameters.AddWithValue("client_idd", client_id);
+                                cmd.Parameters.AddWithValue("client_request_idd", client_request_id);
+                                cmd.Parameters.AddWithValue("unique_request_idd", unique_request_id);
+                                cmd.Parameters.AddWithValue("operatorr", opt);
+                                cmd.Parameters.AddWithValue("msisdnn", msisdn);
+                                cmd.Parameters.AddWithValue("msisdn22", msisdn2);
+                                cmd.Parameters.AddWithValue("extrefnumm", extrefnum);
+                                cmd.Parameters.AddWithValue("clii", cli);
+                                cmd.Parameters.AddWithValue("messagee", message);
+                                cmd.Parameters.AddWithValue("messagetypee", messagetype);
+                                cmd.Parameters.AddWithValue("maskingg", masking);
+                                cmd.Parameters.AddWithValue("no_of_msgg", no_of_msg);
+                                cmd.Parameters.AddWithValue("error_codee", serverResponseCode);
+                                cmd.Parameters.AddWithValue("contactt", "");
+                                cmd.Parameters.AddWithValue("creditDeductedd", 0);
+                                cmd.Parameters.AddWithValue("currentBalancee", 0);
+                                if (mnoResponseCode == "1000")
+                                {
+                                    cmd.Parameters.AddWithValue("descriptionn", "success");
+                                }
+                                else
+                                {
+                                    cmd.Parameters.AddWithValue("descriptionn", "fail : mnoResponseCode : " + mnoResponseCode);
+                                }
+
+                                cmd.Parameters.AddWithValue("smsIDD", "serverTxnId : " + serverTxnId + " mnoTxnId : " + mnoTxnId);
+                                cmd.Parameters.AddWithValue("server_process_datee", DateTime.Now);
+                                cmd.Parameters.AddWithValue("ismaskingg", ismasking);
+                                cmd.Parameters.AddWithValue("unicodee", unicode);
+
+                                // Output parameters
+                                var output = new NpgsqlParameter("outdata", NpgsqlTypes.NpgsqlDbType.Varchar, 160)
+                                {
+                                    Direction = System.Data.ParameterDirection.Output
+                                };
+                                cmd.Parameters.Add(output);
+
+                                // Execute the command
+
+
+
+                                // Retrieve output values
+                                try
+                                {
+                                    conn.Open();
+                                    cmd.ExecuteNonQuery();
+                                    conn.Close();
+                                    Console.WriteLine("execute1");
+                                    Console.WriteLine("execute2");
+                                }
+                                catch (Exception ext)
+                                {
+                                    conn.Close();
+                                    Console.WriteLine(ext.ToString());
+                                }
+
+                                // Example: Display the results
+                                //Response.Write($"Name: {empName}<br/>Department: {empDepartment}");
+                            }
                         }
                     }
                 }
                 else if (opt.ToLower() == "bl")
                 {
                     //create proc masking_verification_proc @client_id varchar(50),@masking varchar(11),@opt varchar(50),@outdata varchar(160) output
-                    sampleCMD1 = new OleDbCommand("masking_verification_proc", connectObj1);
+                    /*sampleCMD1 = new OleDbCommand("masking_verification_proc", connectObj1);
                     sampleCMD1.CommandType = CommandType.StoredProcedure;
 
                     sampParm1 = new OleDbParameter();
@@ -1225,152 +1102,57 @@ namespace ConsoleApp_api
                     {
                         connectObj1.Close();
                         //response = ext.ToString();
+                    }*/
+
+                    using (var conn = new NpgsqlConnection(connString))
+                    {
+                        //conn.Open();
+
+                        using (var cmd = new NpgsqlCommand("masking_verification_proc", conn))
+                        {
+                            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                            // Input parameter
+                            cmd.Parameters.AddWithValue("client_idd", client_id);
+                            cmd.Parameters.AddWithValue("maskingg", masking.ToString());
+                            cmd.Parameters.AddWithValue("optt", opt.ToString());
+
+                            // Output parameters
+                            var output = new NpgsqlParameter("outdata", NpgsqlTypes.NpgsqlDbType.Varchar, 160)
+                            {
+                                Direction = System.Data.ParameterDirection.Output
+                            };
+                            cmd.Parameters.Add(output);
+
+                            // Execute the command
+
+
+
+                            // Retrieve output values
+                            try
+                            {
+                                conn.Open();
+                                cmd.ExecuteNonQuery();
+                                conn.Close();
+
+
+                                outdata_masking = output.Value.ToString();
+                            }
+                            catch (Exception ext)
+                            {
+                                conn.Close();
+                            }
+
+                            // Example: Display the results
+                            //Response.Write($"Name: {empName}<br/>Department: {empDepartment}");
+                        }
                     }
 
 
                     if (outdata_masking == "masking matched")
                     {
 
-                        /*try
-                        {
-                            System.Net.HttpWebRequest req;
-                            System.Net.HttpWebResponse res;
-                            System.IO.StreamReader sr;
-                            System.IO.Stream s;
-                            byte[] b;
-
-                            System.Net.ServicePointManager.Expect100Continue = true;
-                            ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; // SecurityProtocolType.Tls12
-
-                            //string str_text = "msisdn=88" + msisdn2 + "&" + System.Uri.EscapeDataString(message) + "&userID=WINTEL&passwd=winAPI@019&sender=" + masking;
-                            string str_text = "msisdn=88" + msisdn2 + "&message=" + System.Uri.EscapeDataString(message) + "&userID=WINTEL&passwd=winAPI@019&sender=" + masking;
-                            //string str_text = "msisdn=8801534983669&message=" + System.Uri.EscapeDataString("Welcome message from Wintel") + "&userID=WINTEL&passwd=winAPI@019&sender=";
-                            //string str_text = "msisdn=8801880084399&message=" + System.Uri.EscapeDataString("বাংলা টেস্ট মেসেজ") + "&userID=WINTEL&passwd=winAPI@019&sender=";
-                            req = (HttpWebRequest)System.Net.WebRequest.Create("https://vas.banglalink.net/sendSMS/sendSMS");
-                            b = System.Text.Encoding.ASCII.GetBytes(str_text);
-                            req.Method = "POST";
-                            req.ContentType = "application/x-www-form-urlencoded";
-                            req.ContentLength = b.Length;
-                            s = req.GetRequestStream();
-                            s.Write(b, 0, b.Length);
-
-                            res = (HttpWebResponse)req.GetResponse();
-
-                            sr = new System.IO.StreamReader(res.GetResponseStream());
-                            des = sr.ReadToEnd().ToString().Trim();
-                            res.Close();
-                            Console.WriteLine(des);
-                        }
-                        catch (Exception eq)
-                        {
-                            Console.WriteLine(eq.ToString());
-                        }
-
-
-
-                        //OleDbConnection connectObj1 = new OleDbConnection("Provider=SQLOLEDB;Data Source=192.168.3.125;uid=sa;pwd=k7b8a9;" + "Initial Catalog=smscontentnew");
-                        //                          OleDbConnection connectObj1 = new OleDbConnection("Provider=SQLOLEDB;Data Source=192.168.3.9;uid=sa;pwd=k7b8a9;" + "Initial Catalog=smscontentnew");
-
-                        //create proc a2p_insert_server_receive @client_id varchar(50),@client_request_id varchar(50),@unique_request_id int, @operator varchar(50),@msisdn varchar(50),@msisdn2 varchar(50),
-                        //@extrefnum varchar(50),@cli varchar(50),@message nvarchar(760),@messagetype varchar(10),@masking varchar(11),
-                        //@no_of_msg int, @error_code varchar(10),@contact varchar(10),@creditDeducted int, @currentBalance int, @description varchar(400),
-                        //@smsID varchar(50),@server_process_date varchar(100),@ismasking varchar(10),@outdata varchar(160) output
-
-                        sampleCMD1 = new OleDbCommand("a2p_insert_server_receive", connectObj1);
-                        sampleCMD1.CommandType = CommandType.StoredProcedure;
-
-                        sampParm1 = new OleDbParameter();
-                        sampParm1 = sampleCMD1.Parameters.Add("@client_id", OleDbType.VarChar, 50);
-                        sampParm1.Value = client_id;
-                        sampParm1 = sampleCMD1.Parameters.Add("@client_request_id", OleDbType.VarChar, 50);
-                        sampParm1.Value = client_request_id;
-                        sampParm1 = sampleCMD1.Parameters.Add("@unique_request_id", OleDbType.Integer);
-                        sampParm1.Value = unique_request_id;
-                        sampParm1 = sampleCMD1.Parameters.Add("@operator", OleDbType.VarChar, 50);
-                        sampParm1.Value = opt;
-                        sampParm1 = sampleCMD1.Parameters.Add("@msisdn", OleDbType.VarChar, 50);
-                        sampParm1.Value = msisdn;
-                        //     sampParm1 = sampleCMD1.Parameters.Add("@type", OleDbType.VarChar, 50);
-                        //     sampParm1.Value = type;
-                        sampParm1 = sampleCMD1.Parameters.Add("@msisdn2", OleDbType.VarChar, 50);
-                        //      sampParm1.Value = msisdn2;
-                        sampParm1.Value = msisdn2;
-
-                        //             sampParm1 = sampleCMD1.Parameters.Add("@amount", OleDbType.Integer);
-                        //          sampParm1.Value = amount;
-                        //            sampParm1 = sampleCMD1.Parameters.Add("@txnstatus", OleDbType.VarChar, 50);
-                        //            sampParm1.Value = rsp_txnstatus;
-                        sampParm1 = sampleCMD1.Parameters.Add("@extrefnum", OleDbType.VarChar, 50);
-                        sampParm1.Value = extrefnum;
-
-                        sampParm1 = sampleCMD1.Parameters.Add("@cli", OleDbType.VarChar, 50);
-                        sampParm1.Value = cli;
-                        sampParm1 = sampleCMD1.Parameters.Add("@message", OleDbType.WChar, 1000);
-                        sampParm1.Value = message;
-                        sampParm1 = sampleCMD1.Parameters.Add("@messagetype", OleDbType.VarChar, 10);
-                        sampParm1.Value = messagetype;
-                        sampParm1 = sampleCMD1.Parameters.Add("@masking", OleDbType.VarChar, 11);
-                        sampParm1.Value = masking;
-
-                        sampParm1 = sampleCMD1.Parameters.Add("@no_of_msg", OleDbType.Integer);
-                        sampParm1.Value = no_of_msg;
-                        sampParm1 = sampleCMD1.Parameters.Add("@error_code", OleDbType.VarChar, 10);
-                        // sampParm1.Value = rsp_message;
-                        sampParm1.Value = "";
-                        sampParm1 = sampleCMD1.Parameters.Add("@contact", OleDbType.VarChar, 10);
-                        //  sampParm1.Value = req_type;
-                        sampParm1.Value = "";
-                        sampParm1 = sampleCMD1.Parameters.Add("@creditDeducted", OleDbType.Integer);
-                        //sampParm1.Value = no_of_msg;
-                        sampParm1.Value = 0;
-
-                        sampParm1 = sampleCMD1.Parameters.Add("@currentBalance", OleDbType.Integer);
-                        //sampParm1.Value = 1;
-                        sampParm1.Value = 0;
-                        sampParm1 = sampleCMD1.Parameters.Add("@description", OleDbType.VarChar, 400);
-                        if (des.IndexOf("Fail Count : 0") > 0)
-                        {
-                            sampParm1.Value = "success";
-                        }
-                        else
-                        {
-                            sampParm1.Value = "fail";
-                        }
-                        sampParm1 = sampleCMD1.Parameters.Add("@smsID", OleDbType.VarChar, 50);
-                        //sampParm1.Value = req_type;
-                        sampParm1.Value = unique_request_id + ": " + des;
-                        sampParm1 = sampleCMD1.Parameters.Add("@server_process_date", OleDbType.VarChar, 100);
-                        //sampParm1.Value = rsp_date;
-                        sampParm1.Value = DateTime.Now;
-
-                        sampParm1 = sampleCMD1.Parameters.Add("@ismasking", OleDbType.VarChar, 10);
-                        sampParm1.Value = ismasking;
-
-                        sampParm1 = sampleCMD1.Parameters.Add("@unicode", OleDbType.VarChar, 20);
-                        sampParm1.Value = unicode;
-
-                        sampParm1 = sampleCMD1.Parameters.Add("@outdata", OleDbType.VarChar, 160);
-                        sampParm1.Direction = ParameterDirection.Output;
-
-
-                        try
-                        {
-                            Console.WriteLine("execute1");
-                            connectObj1.Open();
-                            sampleCMD1.ExecuteNonQuery();
-                            connectObj1.Close();
-                            Console.WriteLine("execute2");
-                            //string outdata_check = sampleCMD1.Parameters["@outdata"].Value.ToString();
-                            //Console.WriteLine(outdata_check);
-                        }
-                        catch (Exception ep)
-                        {
-
-                            Console.WriteLine(ep.ToString());
-
-                        }*/
-
-                        try
+                       try
                         {
 
                             if (masking == "SALMAN UCL")
@@ -1482,7 +1264,7 @@ namespace ConsoleApp_api
                         //                          OleDbConnection connectObj1 = new OleDbConnection("Provider=SQLOLEDB;Data Source=192.168.3.9;uid=sa;pwd=k7b8a9;" + "Initial Catalog=smscontentnew");
 
 
-                        sampleCMD1 = new OleDbCommand("a2p_insert_server_receive", connectObj1);
+                        /*sampleCMD1 = new OleDbCommand("a2p_insert_server_receive", connectObj1);
                         sampleCMD1.CommandType = CommandType.StoredProcedure;
 
                         sampParm1 = new OleDbParameter();
@@ -1571,6 +1353,76 @@ namespace ConsoleApp_api
 
                             Console.WriteLine(ep.ToString());
 
+                        }*/
+
+                        using (var conn = new NpgsqlConnection(connString))
+                        {
+                            //conn.Open();
+
+                            using (var cmd = new NpgsqlCommand("a2p_insert_server_receive", conn))
+                            {
+                                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                                // Input parameter
+                                cmd.Parameters.AddWithValue("client_idd", client_id);
+                                cmd.Parameters.AddWithValue("client_request_idd", client_request_id);
+                                cmd.Parameters.AddWithValue("unique_request_idd", unique_request_id);
+                                cmd.Parameters.AddWithValue("operatorr", opt);
+                                cmd.Parameters.AddWithValue("msisdnn", msisdn);
+                                cmd.Parameters.AddWithValue("msisdn22", msisdn2);
+                                cmd.Parameters.AddWithValue("extrefnumm", extrefnum);
+                                cmd.Parameters.AddWithValue("clii", cli);
+                                cmd.Parameters.AddWithValue("messagee", message);
+                                cmd.Parameters.AddWithValue("messagetypee", messagetype);
+                                cmd.Parameters.AddWithValue("maskingg", masking);
+                                cmd.Parameters.AddWithValue("no_of_msgg", no_of_msg);
+                                cmd.Parameters.AddWithValue("error_codee", serverResponseCode);
+                                cmd.Parameters.AddWithValue("contactt", "");
+                                cmd.Parameters.AddWithValue("creditDeductedd", 0);
+                                cmd.Parameters.AddWithValue("currentBalancee", 0);
+                                if (mnoResponseCode == "1000")
+                                {
+                                    cmd.Parameters.AddWithValue("descriptionn", "success");
+                                }
+                                else
+                                {
+                                    cmd.Parameters.AddWithValue("descriptionn", "fail : mnoResponseCode : " + mnoResponseCode);
+                                }
+
+                                cmd.Parameters.AddWithValue("smsIDD", "serverTxnId : " + serverTxnId + " mnoTxnId : " + mnoTxnId);
+                                cmd.Parameters.AddWithValue("server_process_datee", DateTime.Now);
+                                cmd.Parameters.AddWithValue("ismaskingg", ismasking);
+                                cmd.Parameters.AddWithValue("unicodee", unicode);
+
+                                // Output parameters
+                                var output = new NpgsqlParameter("outdata", NpgsqlTypes.NpgsqlDbType.Varchar, 160)
+                                {
+                                    Direction = System.Data.ParameterDirection.Output
+                                };
+                                cmd.Parameters.Add(output);
+
+                                // Execute the command
+
+
+
+                                // Retrieve output values
+                                try
+                                {
+                                    conn.Open();
+                                    cmd.ExecuteNonQuery();
+                                    conn.Close();
+                                    Console.WriteLine("execute1");
+                                    Console.WriteLine("execute2");
+                                }
+                                catch (Exception ext)
+                                {
+                                    conn.Close();
+                                    Console.WriteLine(ext.ToString());
+                                }
+
+                                // Example: Display the results
+                                //Response.Write($"Name: {empName}<br/>Department: {empDepartment}");
+                            }
                         }
 
                     }
@@ -1578,7 +1430,7 @@ namespace ConsoleApp_api
                 else if (opt.ToLower() == "robi" || opt.ToLower() == "airtel")
                 {
                     //create proc masking_verification_proc @client_id varchar(50),@masking varchar(11),@opt varchar(50),@outdata varchar(160) output
-                    sampleCMD1 = new OleDbCommand("masking_verification_proc", connectObj1);
+                    /*sampleCMD1 = new OleDbCommand("masking_verification_proc", connectObj1);
                     sampleCMD1.CommandType = CommandType.StoredProcedure;
 
                     sampParm1 = new OleDbParameter();
@@ -1611,6 +1463,50 @@ namespace ConsoleApp_api
                     {
                         connectObj1.Close();
                         //response = ext.ToString();
+                    }*/
+
+                    using (var conn = new NpgsqlConnection(connString))
+                    {
+                        //conn.Open();
+
+                        using (var cmd = new NpgsqlCommand("masking_verification_proc", conn))
+                        {
+                            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                            // Input parameter
+                            cmd.Parameters.AddWithValue("client_idd", client_id);
+                            cmd.Parameters.AddWithValue("maskingg", masking.ToString());
+                            cmd.Parameters.AddWithValue("optt", opt.ToString());
+
+                            // Output parameters
+                            var output = new NpgsqlParameter("outdata", NpgsqlTypes.NpgsqlDbType.Varchar, 160)
+                            {
+                                Direction = System.Data.ParameterDirection.Output
+                            };
+                            cmd.Parameters.Add(output);
+
+                            // Execute the command
+
+
+
+                            // Retrieve output values
+                            try
+                            {
+                                conn.Open();
+                                cmd.ExecuteNonQuery();
+                                conn.Close();
+
+
+                                outdata_masking = output.Value.ToString();
+                            }
+                            catch (Exception ext)
+                            {
+                                conn.Close();
+                            }
+
+                            // Example: Display the results
+                            //Response.Write($"Name: {empName}<br/>Department: {empDepartment}");
+                        }
                     }
 
 
@@ -1639,140 +1535,7 @@ namespace ConsoleApp_api
                         }
 
                         //string sender = "Wintel";
-                        /*  url = "https://api.mobireach.com.bd/SendTextMessage?Username=wintel&Password=WinA2p362@&From=" + masking + "&To=" + msisdn2 + "&Message=" + System.Uri.EscapeDataString(message);
-
-
-                          HttpWebRequest webRequest = (HttpWebRequest)WebRequest.Create(url);
-                          webRequest.Timeout = 5000;
-
-                          HttpWebResponse response = (HttpWebResponse)webRequest.GetResponse();
-                          Stream responsedata = response.GetResponseStream();
-                          StreamReader reader = new StreamReader(responsedata);
-                          str = reader.ReadToEnd();
-
-                          response.Close();
-
-
-                          Console.WriteLine(str);
-
-
-                          XmlDocument xml = new XmlDocument();
-                          //string myXmlString = "<ArrayOfServiceClass><ServiceClass><MessageId>1645081686603561</MessageId><Status>0</Status><StatusText>success</StatusText><ErrorCode>0</ErrorCode><ErrorText></ErrorText><SMSCount>1</SMSCount><CurrentCredit>16096.52</CurrentCredit></ServiceClass></ArrayOfServiceClass>";
-                          string myXmlString = str.ToString();
-                          xml.LoadXml(myXmlString);
-
-                          XmlNodeList xnList = xml.SelectNodes("/ArrayOfServiceClass/ServiceClass");
-                          foreach (XmlNode xn in xnList)
-                          {
-                              string MessageId_robi = xn["MessageId"].InnerText;
-                              string StatusText = xn["StatusText"].InnerText;
-                              string SMSCount_robi = xn["SMSCount"].InnerText;
-                              string ErrorCode_robi = xn["ErrorCode"].InnerText;
-                              string CurrentCredit_robi = xn["CurrentCredit"].InnerText;
-
-
-
-
-
-
-                              sampleCMD1 = new OleDbCommand("a2p_insert_server_receive", connectObj1);
-                              sampleCMD1.CommandType = CommandType.StoredProcedure;
-
-                              sampParm1 = new OleDbParameter();
-                              sampParm1 = sampleCMD1.Parameters.Add("@client_id", OleDbType.VarChar, 50);
-                              sampParm1.Value = client_id;
-                              sampParm1 = sampleCMD1.Parameters.Add("@client_request_id", OleDbType.VarChar, 50);
-                              sampParm1.Value = client_request_id;
-                              sampParm1 = sampleCMD1.Parameters.Add("@unique_request_id", OleDbType.Integer);
-                              sampParm1.Value = unique_request_id;
-                              sampParm1 = sampleCMD1.Parameters.Add("@operator", OleDbType.VarChar, 50);
-                              sampParm1.Value = opt;
-                              sampParm1 = sampleCMD1.Parameters.Add("@msisdn", OleDbType.VarChar, 50);
-                              sampParm1.Value = msisdn;
-                              //     sampParm1 = sampleCMD1.Parameters.Add("@type", OleDbType.VarChar, 50);
-                              //     sampParm1.Value = type;
-                              sampParm1 = sampleCMD1.Parameters.Add("@msisdn2", OleDbType.VarChar, 50);
-                              //      sampParm1.Value = msisdn2;
-                              sampParm1.Value = msisdn2;
-
-                              //             sampParm1 = sampleCMD1.Parameters.Add("@amount", OleDbType.Integer);
-                              //          sampParm1.Value = amount;
-                              //            sampParm1 = sampleCMD1.Parameters.Add("@txnstatus", OleDbType.VarChar, 50);
-                              //            sampParm1.Value = rsp_txnstatus;
-                              sampParm1 = sampleCMD1.Parameters.Add("@extrefnum", OleDbType.VarChar, 50);
-                              sampParm1.Value = extrefnum;
-
-                              sampParm1 = sampleCMD1.Parameters.Add("@cli", OleDbType.VarChar, 50);
-                              sampParm1.Value = cli;
-                              sampParm1 = sampleCMD1.Parameters.Add("@message", OleDbType.WChar, 1000);
-                              sampParm1.Value = message;
-                              sampParm1 = sampleCMD1.Parameters.Add("@messagetype", OleDbType.VarChar, 10);
-                              sampParm1.Value = messagetype;
-                              sampParm1 = sampleCMD1.Parameters.Add("@masking", OleDbType.VarChar, 11);
-                              sampParm1.Value = masking;
-
-                              sampParm1 = sampleCMD1.Parameters.Add("@no_of_msg", OleDbType.Integer);
-                              sampParm1.Value = no_of_msg;
-                              sampParm1 = sampleCMD1.Parameters.Add("@error_code", OleDbType.VarChar, 10);
-                              // sampParm1.Value = rsp_message;
-                              sampParm1.Value = ErrorCode_robi;
-                              sampParm1 = sampleCMD1.Parameters.Add("@contact", OleDbType.VarChar, 10);
-                              //  sampParm1.Value = req_type;
-                              sampParm1.Value = "";
-                              sampParm1 = sampleCMD1.Parameters.Add("@creditDeducted", OleDbType.Integer);
-                              //sampParm1.Value = no_of_msg;
-                              sampParm1.Value = SMSCount_robi;
-
-                              sampParm1 = sampleCMD1.Parameters.Add("@currentBalance", OleDbType.Integer);
-                              //sampParm1.Value = 1;
-                              sampParm1.Value = Convert.ToDecimal(CurrentCredit_robi);
-                              sampParm1 = sampleCMD1.Parameters.Add("@description", OleDbType.VarChar, 400);
-                              if (ErrorCode_robi == "0")
-                              {
-                                  sampParm1.Value = "success";
-                              }
-                              else
-                              {
-                                  sampParm1.Value = "fail";
-                              }
-                              sampParm1 = sampleCMD1.Parameters.Add("@smsID", OleDbType.VarChar, 50);
-                              //sampParm1.Value = req_type;
-                              sampParm1.Value = MessageId_robi;
-                              sampParm1 = sampleCMD1.Parameters.Add("@server_process_date", OleDbType.VarChar, 100);
-                              //sampParm1.Value = rsp_date;
-                              sampParm1.Value = DateTime.Now;
-
-                              sampParm1 = sampleCMD1.Parameters.Add("@ismasking", OleDbType.VarChar, 10);
-                              sampParm1.Value = ismasking;
-
-                              sampParm1 = sampleCMD1.Parameters.Add("@unicode", OleDbType.VarChar, 20);
-                              sampParm1.Value = unicode;
-
-                              sampParm1 = sampleCMD1.Parameters.Add("@outdata", OleDbType.VarChar, 160);
-                              sampParm1.Direction = ParameterDirection.Output;
-
-
-                              try
-                              {
-                                  Console.WriteLine("execute1");
-                                  connectObj1.Open();
-                                  sampleCMD1.ExecuteNonQuery();
-                                  connectObj1.Close();
-                                  Console.WriteLine("execute2");
-                                  //string outdata_check = sampleCMD1.Parameters["@outdata"].Value.ToString();
-                                  //Console.WriteLine(outdata_check);
-                              }
-                              catch (Exception ep)
-                              {
-
-                                  Console.WriteLine(ep.ToString());
-
-                              }
-
-
-
-                          }*/
-
+                        
                         try
                         {
 
@@ -1876,7 +1639,7 @@ namespace ConsoleApp_api
                         //                          OleDbConnection connectObj1 = new OleDbConnection("Provider=SQLOLEDB;Data Source=192.168.3.9;uid=sa;pwd=k7b8a9;" + "Initial Catalog=smscontentnew");
 
 
-                        sampleCMD1 = new OleDbCommand("a2p_insert_server_receive", connectObj1);
+                        /*sampleCMD1 = new OleDbCommand("a2p_insert_server_receive", connectObj1);
                         sampleCMD1.CommandType = CommandType.StoredProcedure;
 
                         sampParm1 = new OleDbParameter();
@@ -1965,6 +1728,76 @@ namespace ConsoleApp_api
 
                             Console.WriteLine(ep.ToString());
 
+                        }*/
+
+                        using (var conn = new NpgsqlConnection(connString))
+                        {
+                            //conn.Open();
+
+                            using (var cmd = new NpgsqlCommand("a2p_insert_server_receive", conn))
+                            {
+                                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                                // Input parameter
+                                cmd.Parameters.AddWithValue("client_idd", client_id);
+                                cmd.Parameters.AddWithValue("client_request_idd", client_request_id);
+                                cmd.Parameters.AddWithValue("unique_request_idd", unique_request_id);
+                                cmd.Parameters.AddWithValue("operatorr", opt);
+                                cmd.Parameters.AddWithValue("msisdnn", msisdn);
+                                cmd.Parameters.AddWithValue("msisdn22", msisdn2);
+                                cmd.Parameters.AddWithValue("extrefnumm", extrefnum);
+                                cmd.Parameters.AddWithValue("clii", cli);
+                                cmd.Parameters.AddWithValue("messagee", message);
+                                cmd.Parameters.AddWithValue("messagetypee", messagetype);
+                                cmd.Parameters.AddWithValue("maskingg", masking);
+                                cmd.Parameters.AddWithValue("no_of_msgg", no_of_msg);
+                                cmd.Parameters.AddWithValue("error_codee", serverResponseCode);
+                                cmd.Parameters.AddWithValue("contactt", "");
+                                cmd.Parameters.AddWithValue("creditDeductedd", 0);
+                                cmd.Parameters.AddWithValue("currentBalancee", 0);
+                                if (mnoResponseCode == "1000")
+                                {
+                                    cmd.Parameters.AddWithValue("descriptionn", "success");
+                                }
+                                else
+                                {
+                                    cmd.Parameters.AddWithValue("descriptionn", "fail : mnoResponseCode : " + mnoResponseCode);
+                                }
+
+                                cmd.Parameters.AddWithValue("smsIDD", "serverTxnId : " + serverTxnId + " mnoTxnId : " + mnoTxnId);
+                                cmd.Parameters.AddWithValue("server_process_datee", DateTime.Now);
+                                cmd.Parameters.AddWithValue("ismaskingg", ismasking);
+                                cmd.Parameters.AddWithValue("unicodee", unicode);
+
+                                // Output parameters
+                                var output = new NpgsqlParameter("outdata", NpgsqlTypes.NpgsqlDbType.Varchar, 160)
+                                {
+                                    Direction = System.Data.ParameterDirection.Output
+                                };
+                                cmd.Parameters.Add(output);
+
+                                // Execute the command
+
+
+
+                                // Retrieve output values
+                                try
+                                {
+                                    conn.Open();
+                                    cmd.ExecuteNonQuery();
+                                    conn.Close();
+                                    Console.WriteLine("execute1");
+                                    Console.WriteLine("execute2");
+                                }
+                                catch (Exception ext)
+                                {
+                                    conn.Close();
+                                    Console.WriteLine(ext.ToString());
+                                }
+
+                                // Example: Display the results
+                                //Response.Write($"Name: {empName}<br/>Department: {empDepartment}");
+                            }
                         }
 
 
@@ -2047,7 +1880,7 @@ namespace ConsoleApp_api
                     //                          OleDbConnection connectObj1 = new OleDbConnection("Provider=SQLOLEDB;Data Source=192.168.3.9;uid=sa;pwd=k7b8a9;" + "Initial Catalog=smscontentnew");
 
 
-                    sampleCMD1 = new OleDbCommand("itopup_insert_server_receive", connectObj1);
+                    /*sampleCMD1 = new OleDbCommand("itopup_insert_server_receive", connectObj1);
                     sampleCMD1.CommandType = CommandType.StoredProcedure;
 
                     sampParm1 = new OleDbParameter();
@@ -2133,7 +1966,7 @@ namespace ConsoleApp_api
 
                         Console.WriteLine(ep.ToString());
 
-                    }
+                    }*/
 
 
 
@@ -2713,7 +2546,7 @@ namespace ConsoleApp_api
                             //                          OleDbConnection connectObj1 = new OleDbConnection("Provider=SQLOLEDB;Data Source=192.168.3.9;uid=sa;pwd=k7b8a9;" + "Initial Catalog=smscontentnew");
 
 
-                            sampleCMD1 = new OleDbCommand("a2p_insert_server_receive", connectObj1);
+                            /*sampleCMD1 = new OleDbCommand("a2p_insert_server_receive", connectObj1);
                             sampleCMD1.CommandType = CommandType.StoredProcedure;
 
                             sampParm1 = new OleDbParameter();
@@ -2802,6 +2635,75 @@ namespace ConsoleApp_api
 
                                 Console.WriteLine(ep.ToString());
 
+                            }*/
+                            using (var conn = new NpgsqlConnection(connString))
+                            {
+                                //conn.Open();
+
+                                using (var cmd = new NpgsqlCommand("a2p_insert_server_receive", conn))
+                                {
+                                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                                    // Input parameter
+                                    cmd.Parameters.AddWithValue("client_idd", client_id);
+                                    cmd.Parameters.AddWithValue("client_request_idd", client_request_id);
+                                    cmd.Parameters.AddWithValue("unique_request_idd", unique_request_id);
+                                    cmd.Parameters.AddWithValue("operatorr", opt);
+                                    cmd.Parameters.AddWithValue("msisdnn", msisdn);
+                                    cmd.Parameters.AddWithValue("msisdn22", msisdn2);
+                                    cmd.Parameters.AddWithValue("extrefnumm", extrefnum);
+                                    cmd.Parameters.AddWithValue("clii", cli);
+                                    cmd.Parameters.AddWithValue("messagee", message);
+                                    cmd.Parameters.AddWithValue("messagetypee", messagetype);
+                                    cmd.Parameters.AddWithValue("maskingg", "");
+                                    cmd.Parameters.AddWithValue("no_of_msgg", no_of_msg);
+                                    cmd.Parameters.AddWithValue("error_codee", serverResponseCode);
+                                    cmd.Parameters.AddWithValue("contactt", "");
+                                    cmd.Parameters.AddWithValue("creditDeductedd", 0);
+                                    cmd.Parameters.AddWithValue("currentBalancee", 0);
+                                    if (mnoResponseCode == "1000")
+                                    {
+                                        cmd.Parameters.AddWithValue("descriptionn", "success");
+                                    }
+                                    else
+                                    {
+                                        cmd.Parameters.AddWithValue("descriptionn", "fail : mnoResponseCode : " + mnoResponseCode);
+                                    }
+
+                                    cmd.Parameters.AddWithValue("smsIDD", "serverTxnId : " + serverTxnId + " mnoTxnId : " + mnoTxnId);
+                                    cmd.Parameters.AddWithValue("server_process_datee", DateTime.Now);
+                                    cmd.Parameters.AddWithValue("ismaskingg", ismasking);
+                                    cmd.Parameters.AddWithValue("unicodee", unicode);
+
+                                    // Output parameters
+                                    var output = new NpgsqlParameter("outdata", NpgsqlTypes.NpgsqlDbType.Varchar, 160)
+                                    {
+                                        Direction = System.Data.ParameterDirection.Output
+                                    };
+                                    cmd.Parameters.Add(output);
+
+                                    // Execute the command
+
+
+
+                                    // Retrieve output values
+                                    try
+                                    {
+                                        conn.Open();
+                                        cmd.ExecuteNonQuery();
+                                        conn.Close();
+                                        Console.WriteLine("execute1");
+                                        Console.WriteLine("execute2");
+                                    }
+                                    catch (Exception ext)
+                                    {
+                                        conn.Close();
+                                        Console.WriteLine(ext.ToString());
+                                    }
+
+                                    // Example: Display the results
+                                    //Response.Write($"Name: {empName}<br/>Department: {empDepartment}");
+                                }
                             }
                         }
                         catch (Exception ep)
@@ -3235,7 +3137,7 @@ namespace ConsoleApp_api
                         //                          OleDbConnection connectObj1 = new OleDbConnection("Provider=SQLOLEDB;Data Source=192.168.3.9;uid=sa;pwd=k7b8a9;" + "Initial Catalog=smscontentnew");
 
 
-                        sampleCMD1 = new OleDbCommand("a2p_insert_server_receive", connectObj1);
+                        /*sampleCMD1 = new OleDbCommand("a2p_insert_server_receive", connectObj1);
                         sampleCMD1.CommandType = CommandType.StoredProcedure;
 
                         sampParm1 = new OleDbParameter();
@@ -3322,6 +3224,75 @@ namespace ConsoleApp_api
                         catch (Exception ep)
                         {
                             Console.WriteLine(ep.ToString());
+                        }*/
+                        using (var conn = new NpgsqlConnection(connString))
+                        {
+                            //conn.Open();
+
+                            using (var cmd = new NpgsqlCommand("a2p_insert_server_receive", conn))
+                            {
+                                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+
+                                // Input parameter
+                                cmd.Parameters.AddWithValue("client_idd", client_id);
+                                cmd.Parameters.AddWithValue("client_request_idd", client_request_id);
+                                cmd.Parameters.AddWithValue("unique_request_idd", unique_request_id);
+                                cmd.Parameters.AddWithValue("operatorr", opt);
+                                cmd.Parameters.AddWithValue("msisdnn", msisdn);
+                                cmd.Parameters.AddWithValue("msisdn22", msisdn2);
+                                cmd.Parameters.AddWithValue("extrefnumm", extrefnum);
+                                cmd.Parameters.AddWithValue("clii", cli);
+                                cmd.Parameters.AddWithValue("messagee", message);
+                                cmd.Parameters.AddWithValue("messagetypee", messagetype);
+                                cmd.Parameters.AddWithValue("maskingg", "");
+                                cmd.Parameters.AddWithValue("no_of_msgg", no_of_msg);
+                                cmd.Parameters.AddWithValue("error_codee", serverResponseCode);
+                                cmd.Parameters.AddWithValue("contactt", "");
+                                cmd.Parameters.AddWithValue("creditDeductedd", 0);
+                                cmd.Parameters.AddWithValue("currentBalancee", 0);
+                                if (mnoResponseCode == "1000")
+                                {
+                                    cmd.Parameters.AddWithValue("descriptionn", "success");
+                                }
+                                else
+                                {
+                                    cmd.Parameters.AddWithValue("descriptionn", "fail : mnoResponseCode : " + mnoResponseCode);
+                                }
+
+                                cmd.Parameters.AddWithValue("smsIDD", "serverTxnId : " + serverTxnId + " mnoTxnId : " + mnoTxnId);
+                                cmd.Parameters.AddWithValue("server_process_datee", DateTime.Now);
+                                cmd.Parameters.AddWithValue("ismaskingg", ismasking);
+                                cmd.Parameters.AddWithValue("unicodee", unicode);
+
+                                // Output parameters
+                                var output = new NpgsqlParameter("outdata", NpgsqlTypes.NpgsqlDbType.Varchar, 160)
+                                {
+                                    Direction = System.Data.ParameterDirection.Output
+                                };
+                                cmd.Parameters.Add(output);
+
+                                // Execute the command
+
+
+
+                                // Retrieve output values
+                                try
+                                {
+                                    conn.Open();
+                                    cmd.ExecuteNonQuery();
+                                    conn.Close();
+                                    Console.WriteLine("execute1");
+                                    Console.WriteLine("execute2");
+                                }
+                                catch (Exception ext)
+                                {
+                                    conn.Close();
+                                    Console.WriteLine(ext.ToString());
+                                }
+
+                                // Example: Display the results
+                                //Response.Write($"Name: {empName}<br/>Department: {empDepartment}");
+                            }
                         }
                     }
                 }
