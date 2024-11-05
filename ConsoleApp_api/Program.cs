@@ -113,6 +113,7 @@ namespace ConsoleApp_api
             string rsp_con_type = string.Empty;
             string rsp_operator = string.Empty;
             string outdata_masking = string.Empty;
+            string longcode = string.Empty;
 
             //OleDbConnection connectObj1 = new OleDbConnection("Provider=SQLOLEDB;Data Source=WINTEL-ECS;uid=sa;pwd=K1B2A3#;" + "Initial Catalog=my_db");
             string connString = "Host=localhost;Port=5432;Username=postgres;Password=@Online5@;Database=WAHED_DB;";
@@ -2406,7 +2407,7 @@ namespace ConsoleApp_api
                     {
                         try
                         {
-                            string longcode = string.Empty;
+                            //string longcode = string.Empty;
                             string bilmsdn = string.Empty;
 
                             if (client_id == "ibbl")
@@ -2649,7 +2650,7 @@ namespace ConsoleApp_api
                                     cmd.Parameters.AddWithValue("client_request_idd", client_request_id);
                                     cmd.Parameters.AddWithValue("unique_request_idd", unique_request_id);
                                     cmd.Parameters.AddWithValue("operatorr", opt);
-                                    cmd.Parameters.AddWithValue("msisdnn", msisdn);
+                                    cmd.Parameters.AddWithValue("msisdnn", longcode);
                                     cmd.Parameters.AddWithValue("msisdn22", msisdn2);
                                     cmd.Parameters.AddWithValue("extrefnumm", extrefnum);
                                     cmd.Parameters.AddWithValue("clii", cli);
@@ -2955,7 +2956,7 @@ namespace ConsoleApp_api
 
                             //
 
-                            string longcode = string.Empty;
+                            //string longcode = string.Empty;
 
                             if (client_id == "shwapno")
                             {
@@ -3238,7 +3239,7 @@ namespace ConsoleApp_api
                                 cmd.Parameters.AddWithValue("client_request_idd", client_request_id);
                                 cmd.Parameters.AddWithValue("unique_request_idd", unique_request_id);
                                 cmd.Parameters.AddWithValue("operatorr", opt);
-                                cmd.Parameters.AddWithValue("msisdnn", msisdn);
+                                cmd.Parameters.AddWithValue("msisdnn", longcode);
                                 cmd.Parameters.AddWithValue("msisdn22", msisdn2);
                                 cmd.Parameters.AddWithValue("extrefnumm", extrefnum);
                                 cmd.Parameters.AddWithValue("clii", cli);
